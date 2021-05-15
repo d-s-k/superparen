@@ -202,19 +202,19 @@
     ;; handling the comment. Instead, we READ along merrily but set
     ;; #\. in our readtable to a non-terminating macro char function
     ;; that returns a DOT object, which we handle here.
-    #-DEBUG (format t"READ-OPEN-BRACKET: Detected reified DOT~%")
+    #+DEBUG (format t"READ-OPEN-BRACKET: Detected reified DOT~%")
     (funcall succeed (read-after-dot stream (paren-mate open-char))))
   (:method (stream open-char obj collect succeed)
     (funcall collect obj)))
 
 
 (defun read-after-dot (stream end-char)
-  #-debug (format t "~&READ-AFTER-DOT~%")
+  #+DEBUG (format t "~&READ-AFTER-DOT~%")
   (let ((*after-dot-p* t))		;READ-COMMA grovels this
     (declare (special *after-dot-p*))
     (handler-bind ((match-error
 		     (lambda (c)
-		       #-debug
+		       #+DEBUG
 		       (format t "READ-AFTER-DOT: Looking for ~S, saw ~S~%"
 			       end-char (match-error-char c))
 		       (let ((char (match-error-char c)))
@@ -253,7 +253,7 @@
 	    (next-char (eql *close-paren-char*)))
     (match-error stream next-char))
   (:method (stream end-char list-tail next-char)
-    #-debug (format t "%READ-AFTER-DOT: LIST-TAIL = ~S~%" list-tail)
+    #+DEBUG (format t "%READ-AFTER-DOT: LIST-TAIL = ~S~%" list-tail)
     (let ((forms-after-dot 1))
       (loop
 	(handler-bind ((unmatched-paren-error
@@ -292,7 +292,7 @@
 	     ((#\. #\@) (dot-error stream 'comma-splicing)))))
     (funcall default-comma-reader stream char)))
 
-#-DEBUG
+#+DEBUG
 (defun break* (&optional stream &rest ignorables)
   (declare (ignore ignorables))
   (break "Within ~A: Paren depth: ~A, Bracket depth: ~A, Next char: ~S"
@@ -312,11 +312,11 @@
     (set-macro-character #\) 'read-close-paren)
     (set-macro-character #\. 'read-dot t)
     (set-macro-character #\, 'read-comma)
-    #-DEBUG
+    #+DEBUG
     (set-macro-character #\$ #'break*)
     *readtable*))
 
-#-DEBUG
+#+DEBUG
 (defun tests ()
   (let ((*readtable* *superparen-readtable*)
 	(*package* (find-package "SUPERPAREN"))
